@@ -1,0 +1,37 @@
+Time from mc startup: 0:1Humidity: 96%  Temperature: 19 Soil Humidity: 122TankWaterControl: 15
+Time from mc startup: 0:1Soil humidity:123Soil pump activated
+Time from mc startup: 1:1Humidity: 96%  Temperature: 19 Soil Humidity: 92TankWaterControl: 15
+Time from mc startup: 2:1Humidity: 95%  Temperature: 21 Soil Humidity: 92TankWaterControl: 15
+Time from mc startup: 0:1Humidity: 94%  Temperature: 19 Soil Humidity: 98TankWaterControl: 15
+Time from mc startup: 1:1Humidity: 94%  Temperature: 19 Soil Humidity: 92TankWaterControl: 15
+Time from mc startup: 2:1Humidity: 96%  Temperature: 20 Soil Humidity: 92TankWaterControl: 15
+Time from mc startup: 0:1Humidity: 91%  Temperature: 24 Soil Humidity: 123TankWaterControl: 15
+Time from mc startup: 0:1Soil humidity:123Soil pump activated
+Time from mc startup: 1:1Humidity: 91%  Temperature: 24 Soil Humidity: 119TankWaterControl: 15
+Time from mc startup: 1:1Soil humidity:123Soil pump activated
+Time from mc startup: 2:1Humidity: 92%  Temperature: 24 Soil Humidity: 121TankWaterControl: 15
+Time from mc startup: 2:1Soil humidity:123Soil pump activated
+Time from mc startup: 0:1Humidity: 93%  Temperature: 24 Soil Humidity: 146TankWaterControl: 15
+Time from mc startup: 0:1Soil humidity:147Soil pump activated
+Time from mc startup: 1:1Humidity: 94%  Temperature: 24 Soil Humidity: 136TankWaterControl: 15
+Time from mc startup: 1:1Soil humidity:139Soil pump activated
+Time from mc startup: 2:1Humidity: 90%  Temperature: 25 Soil Humidity: 136TankWaterControl: 15
+Time from mc startup: 2:1Soil humidity:139Soil pump activated
+Time from mc startup: 3:1Humidity: 88%  Temperature: 26 Soil Humidity: 136TankWaterControl: 15
+Time from mc startup: 3:1Soil humidity:140Soil pump activated
+Time from mc startup: 4:1Humidity: 87%  Temperature: 26 Soil Humidity: 137TankWaterControl: 15
+Time from mc startup: 4:1Soil humidity:140Soil pump activated
+Time from mc startup: 5:1Humidity: 89%  Temperature: 26 Soil Humidity: 136TankWaterControl: 15
+Time from mc startup: 5:1Soil humidity:140Soil pump activated
+Time from mc startup: 6:1Humidity: 90%  Temperature: 26 Soil Humidity: 136TankWaterControl: 15
+Time from mc startup: 6:1Soil humidity:139Soil pump activated
+Time from mc startup: 7:1Humidity: 91%  Temperature: 25 Soil Humidity: 137TankWaterControl: 15
+Time from mc startup: 7:1Soil humidity:140Soil pump activated
+Time from mc startup: 8:1Humidity: 91%  Temperature: 25 Soil Humidity: 136TankWaterControl: 15
+Time from mc startup: 8:1Soil humidity:140Soil pump activated
+Time from mc startup: 9:1Humidity: 91%  Temperature: 25 Soil Humidity: 137TankWaterControl: 15
+Time from mc startup: 9:1Soil humidity:140Soil pump activated
+Time from mc startup: 10:1Humidity: 92%  Temperature: 26 Soil Humidity: 137TankWaterControl: 15
+Time from mc startup: 10:1Soil humidity:140Soil pump activated
+Time from mc startup: 11:1Humidity: 92%  Temperature: 26 Soil Humidity: 137TankWaterControl: 15
+Time from mc startup: 11:1Soil humidity:140Soil pump activated
