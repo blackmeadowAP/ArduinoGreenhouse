@@ -4,7 +4,6 @@
 #include <SD.h>
 #include "DHT.h"
 #include <Wire.h>
-#include "Source1.h"
 
 const int chipSelect = 4;
 
@@ -34,15 +33,15 @@ boolean state = false;
 int soilHumidity;
 
 const int dawnHour = 0;    // Час начала светового дня
-const int dawnMinute = 1;  // Минута начала светового дня
-const int duskHour = 13;   // Час начала световой ночи
-const int duskMinute = 59; // Минута начала световой ночи
+const int dawnMinute = 0;  // Минута начала светового дня
+const int duskHour = 0;    // Час начала световой ночи
+const int duskMinute = 10; // Минута начала световой ночи
 
 const int lowAirHumidity = 50;     // нижний порог влажности(сухо)
-const int humidifierWorktime = 60; // время работы увлажнителя воздуха в секундах
+const int humidifierWorkTime = 30; // время работы увлажнителя воздуха в секундах
 const int humidifierPumpTime = 4;  // время работы насоса резервуара увлажнителя в секундах
 const int soilHumidityLevel = 135; // значение влажности почвы, при которой включится автополив
-const int soilPumpTime = 120;      // время работы насоса полива почвы в секундах
+const int soilPumpTime = 30;       // время работы насоса полива почвы в секундах
 
 unsigned long startTimeHumidifier = 0; // Переменная для хранения времени старта
 bool isHumidifierOn = false;           // Переменная для хранения состояния увлажнителя
@@ -54,10 +53,11 @@ unsigned long startTimeHumidifierPump = 0; // Переменная для хра
 bool isHumidifierPumpOn = false;           // Переменная для хранения состояния увлажнителя
 
 // Переменная для хранения текущего времени суток
-boolean isDay = true;
+boolean isDay = false;
 
 void setup()
 {
+
     // Serial.begin(9600);
     SD.begin(chipSelect);
     dht.begin(); // запуск DHT22
@@ -79,65 +79,53 @@ void loop()
     int currentHour = hour();
     int currentMinute = minute();
 
-    Serial.print("Loop at " + currentHour + ":" + currentMinute);
+    // Serial.println("Loop at " + String(currentHour) + ":" + String(currentMinute));
 
     int currentMinutes = currentHour * 60 + currentMinute;
 
+    int h = dht.readHumidity(); // получение значения влажности воздуха
+    int t = dht.readTemperature();
+
+    ThatTurnsMeOn(currentMinute);
+    CheckSoilHumidity(currentHour, currentMinute);
+    CheckHumidity(h, currentHour, currentMinute);
+
+    // delay(60000);
+}
+
+void ThatTurnsMeOn(int currentMinute)
+{
     int downMinutes = dawnHour * 60 + dawnMinute;
     int duskMinutes = duskHour * 60 + duskMinute;
+    bool isDayCycle = (currentMinute >= downMinutes) && (currentMinute <= duskMinutes);
+    bool isChanged = isDayCycle != isDay;
+    isDay = isDayCycle;
 
-
-    bool isBtw = currentMinute < downMinutes && currenMinute > duskMinutes;
-    //((currentHour > dawnHour) || (currentHour == dawnHour && currentMinute >= dawnMinute)) && (currentHour < duskHour || (currentHour == duskHour && currentMinute < duskMinute)
-    if (isBtw)
+    if (isChanged)
     {
-        Serial.print("Inside at " + currentHour + ":" + currentMinute);
-        // Световой день
-        if (!isDay)
+
+        if (isDayCycle)
         {
+
             digitalWrite(light, HIGH); // Включаем освещение
-           
-
-            int h = dht.readHumidity();                                 // получение значения влажности воздуха
-            int t = dht.readTemperature();                              // получение значения температуры воздуха
-            soilHumidity = map(analogRead(soilControl), 0, 255, 0, 99); // получение значения влажности почвы в значениях от 0 до 99;
-
-            String dataString = " Time from mc startup: " + String(currentHour) + " : " + String(currentMinute) + " Humidity: " + String(h) + " % " + " Temperature: " + String(t) + " Soil Humidity: " + String(soilHumidity); //+ "TankWaterControl: " + String(TankWaterControl);
-            // Serial.println(dataString);
-            SaveToSD(dataString);
-            // Serial.println(h);
-            // Serial.println(t);
-
-           
-
-            CheckHumidity(h, currentHour, currentMinute);
-
-            //OliverTank(currentHour, currentMinute);
-
-            CheckSoilHumidity();
-
-            isDay = true;
-            Serial.print("Day starts at " + currentHour + ":" + currentMinute);
         }
-    }
-    else
-    {
-        // Световая ночь
-        if (isDay)
-        { // функция вентиляции вырезана до момента добавления кулеров
-            // digitalWrite(light, LOW);
+        else
+        {
+            // Световая ночь
+
+            //{ // функция вентиляции вырезана до момента добавления кулеров
+            digitalWrite(light, LOW);
             // digitalWrite(ventilation, HIGH);
             // delay(20000);
             // digitalWrite(ventilation, LOW);
-            isDay = false;
-            Serial.print("Day ends at " + currentHour + ":" + currentMinute);
+            // isDay = false;
+            // Serial.println("Day ends at " + String(currentHour) + ":" + String(currentMinute));
         }
     }
-
-    delay(1000); // Ждем 1 секунду
 }
 
-void SaveToSD(String dataString) {
+void SaveToSD(String dataString)
+{
     File dataFile = SD.open("datalog.txt", FILE_WRITE);
     // если файл лога SD карты доступен, в него будут записываться данные с датчиков:
     if (dataFile)
@@ -147,50 +135,33 @@ void SaveToSD(String dataString) {
     }
 }
 
-void OliverTank(int& currentHour, int& currentMinute)
-{
-    if (map(analogRead(TankWaterControl), 0, 255, 0, 99) <= 20) { //если воды в основном баке мало, сигнализация активируется и будет пищать пока не нальют воды
-        String waterTankLog = "";
-
-        waterTankLog = "Time from mc startup: " + String(currentHour) + ":" + String(currentMinute) + "Low water level in reservoir:" + String(map(analogRead(TankWaterControl), 0, 255, 0, 99));
-        //Serial.println(dataString);
-        SaveToSD(waterTankLog);
-        tone(waterAlert, 300, 1000);
-        delay(10000);
-        noTone(waterAlert);
-    }
-}
-
-void CheckSoilHumidity()
+void CheckSoilHumidity(int &currentHour, int &currentMinute)
 {
     soilHumidity = map(analogRead(soilControl), 0, 255, 0, 99);
 
     if (soilHumidity >= soilHumidityLevel)
-    { // если почва сухая, включится насос полива.
-
-        if (!isSoilPumpOn)
-        { // Если увлажнитель выключен, включаем его
-            digitalWrite(waterPump, HIGH);
-            isSoilPumpOn = true;
-            startTimeSoilPump = millis(); // Запоминаем время старта
-        }
-        else if (millis() - startTimeSoilPump >= soilPumpTime * 1000)
-        { // Если прошло достаточно времени, выключаем насос полива
-            digitalWrite(waterPump, LOW);
-            isSoilPumpOn = false;
-        }
-
-        String soilHumidityLog = "Time from mc startup: " + String(currentHour) + ":" + String(currentMinute) + "Soil humidity:" + String(soilHumidity) + " Soil pump activated";
-        // Serial.println(dataString);
-        SaveToSD(soilHumidityLog);
+    {
+        digitalWrite(waterPump, HIGH);
+        delay(soilPumpTime * 1000);
+        digitalWrite(waterPump, LOW);
     }
+
+    else
+    {
+        digitalWrite(waterPump, LOW);
+    }
+
+    String soilHumidityLog = "Time from mc startup: " + String(currentHour) + ":" + String(currentMinute) + "Soil humidity:" + String(soilHumidity) + " Soil pump activated";
+    // Serial.println(dataString);
+    SaveToSD(soilHumidityLog);
 }
 
-void CheckHumidity(int& h, int& currentHour, int& currentMinute)
+void CheckHumidity(int &h, int &currentHour, int &currentMinute)
 {
     h = dht.readHumidity();
     if (h < lowAirHumidity)
-    { // если влажность воздуха низкая, будет включаться увлажнитель. влажность можно повысить только в ограниченном пространстве.
+    {
+        // если влажность воздуха низкая, будет включаться увлажнитель. влажность можно повысить только в ограниченном пространстве.
         String humidifierLog = "";
 
         humidifierLog = "Time from mc startup: " + String(currentHour) + ":" + String(currentMinute) + "Air humidity:" + String(h) + "humidifier activated";
@@ -204,28 +175,13 @@ void CheckHumidity(int& h, int& currentHour, int& currentMinute)
             dataFile.close();
         }
 
-        if (!isHumidifierOn)
-        { // Если увлажнитель выключен, включаем его
-            digitalWrite(humidifier, HIGH);
-            isHumidifierOn = true;
-            startTimeHumidifier = millis(); // Запоминаем время старта
-        }
-        else if (millis() - startTimeHumidifier >= humidifierWorktime * 1000)
-        { // Если прошло достаточно времени, выключаем увлажнитель
-            digitalWrite(humidifier, LOW);
-            isHumidifierOn = false;
-        }
+        digitalWrite(humidifier, HIGH);
+        delay(humidifierWorkTime * 1000);
 
-        if (!isHumidifierPumpOn)
-        { // Если насос увлажнителя выключен, включаем его
-            digitalWrite(humidifierPump, HIGH);
-            isHumidifierPumpOn = true;
-            startTimeHumidifierPump = millis(); // Запоминаем время старта
-        }
-        else if (millis() - startTimeHumidifierPump >= humidifierPumpTime * 1000)
-        { // Если прошло достаточно времени, выключаем насос увлажнителя
-            digitalWrite(humidifierPump, LOW);
-            isHumidifierPumpOn = false;
-        }
+        digitalWrite(humidifier, LOW);
+    }
+    else
+    {
+        digitalWrite(humidifier, LOW);
     }
 }
